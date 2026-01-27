@@ -9,10 +9,9 @@ test('Should verify an approved order', async ({ page }) => {
   await expect(page.getByRole('heading')).toContainText('Consultar Pedido');
   // Act
   await page.getByLabel('Número do Pedido').fill('VLO-U9BW56');
-  await page.getByTestId('search-order-button').click();
+  await page.getByRole('button', { name: 'Buscar Pedido' }).click();
   // Assert
-  await expect(page.getByTestId('order-result-id')).toBeVisible();
-  await expect(page.getByTestId('order-result-id')).toContainText('VLO-U9BW56');
-  await expect(page.getByTestId('order-result-status')).toBeVisible();
-  await expect(page.getByTestId('order-result-status')).toHaveText('APROVADO');
+  await expect(page.locator('//p[text()="VLO-U9BW56"]')).toBeVisible();
+  await expect(page.locator('//div[text()="APROVADO"]')).toBeVisible();
+
 });
