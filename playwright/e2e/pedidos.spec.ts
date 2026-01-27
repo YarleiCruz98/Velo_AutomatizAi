@@ -11,7 +11,7 @@ test('Should verify an approved order', async ({ page }) => {
   await page.getByLabel('Número do Pedido').fill('VLO-U9BW56');
   await page.getByRole('button', { name: 'Buscar Pedido' }).click();
   // Assert
-  await expect(page.locator('//p[text()="VLO-U9BW56"]')).toBeVisible();
-  await expect(page.locator('//div[text()="APROVADO"]')).toBeVisible();
+  await expect(page.getByText('VLO-U9BW56')).toBeVisible();
+  await expect(page.getByText('APROVADO')).toBeVisible();
 
 });
