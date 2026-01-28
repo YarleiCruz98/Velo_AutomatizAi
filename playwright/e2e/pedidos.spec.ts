@@ -1,17 +1,23 @@
 import { test, expect } from '@playwright/test';
-  // AAA Arrange Act Assert
+// AAA Arrange Act Assert
 
 test('Should verify an approved order', async ({ page }) => {
+  // testData
+  const testData = {
+    orderCode: 'VLO-U9BW56',
+    orderStatus: 'APROVADO',
+  };
+
   // Arrange
   await page.goto('http://localhost:5173/');
   await expect(page.getByTestId('hero-section').getByRole('heading')).toContainText('Velô Sprint');
   await page.getByRole('link', { name: 'Consultar Pedido' }).click();
   await expect(page.getByRole('heading')).toContainText('Consultar Pedido');
-  
+
   // Act
-  await page.getByLabel('Número do Pedido').fill('VLO-U9BW56');
+  await page.getByLabel('Número do Pedido').fill(testData.orderCode);
   await page.getByRole('button', { name: 'Buscar Pedido' }).click();
-  
+
   // Assert
   // Locate the paragraph with the text "Pedido", go up to its parent element (the order block)
   // and inside it, look specifically for the <p> that contains the code "VLO-U9BW56".
@@ -27,7 +33,7 @@ test('Should verify an approved order', async ({ page }) => {
   const containerPedido = page.getByRole('paragraph')
     .filter({ hasText: /^Pedido$/ })
     .locator('..'); // go up to the parent element of "Pedido"
-  await expect(containerPedido).toContainText('VLO-U9BW56', {timeout: 10_000});
+  await expect(containerPedido).toContainText(testData.orderCode, { timeout: 10_000 });
 
-  await expect(page.getByText('APROVADO')).toBeVisible();
+  await expect(page.getByText(testData.orderStatus)).toBeVisible();
 });
