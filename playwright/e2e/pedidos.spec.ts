@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import {generateOrderNumber} from '../support/helpers'
 // AAA Arrange Act Assert
 
 test('Should verify an approved order', async ({ page }) => {
@@ -41,7 +42,7 @@ test('Should verify an approved order', async ({ page }) => {
 test('Should verify an non existing order', async ({ page }) => {
   // testData
   const testData = {
-    orderCode: 'VLO-XXXXX',
+    orderCode: generateOrderNumber(),
     orderWarning: 'Pedido não encontrado',
     orderNotFound: 'Verifique o número do pedido e tente novamente',
   };
