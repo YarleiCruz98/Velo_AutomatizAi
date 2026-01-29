@@ -37,3 +37,29 @@ test('Should verify an approved order', async ({ page }) => {
 
   await expect(page.getByText(testData.orderStatus)).toBeVisible();
 });
+
+test('Should verify an non existing order', async ({ page }) => {
+  // testData
+  const testData = {
+    orderCode: 'VLO-XXXXX',
+    orderWarning: 'Pedido não encontrado',
+    orderNotFound: 'Verifique o número do pedido e tente novamente',
+  };
+
+  // Arrange
+  await page.goto('http://localhost:5173/');
+  await expect(page.getByTestId('hero-section').getByRole('heading')).toContainText('Velô Sprint');
+  await page.getByRole('link', { name: 'Consultar Pedido' }).click();
+  await expect(page.getByRole('heading')).toContainText('Consultar Pedido');
+
+  // Act
+  await page.getByLabel('Número do Pedido').fill(testData.orderCode);
+  await page.getByRole('button', { name: 'Buscar Pedido' }).click();
+
+  // Assert
+  await expect(page.locator('#root')).toMatchAriaSnapshot(`
+    - img
+    - heading "Pedido não encontrado" [level=3]
+    - paragraph: Verifique o número do pedido e tente novamente`);
+
+});
