@@ -72,14 +72,12 @@ test.describe('order lookup', () => {
     await page.getByRole('button', { name: 'Buscar Pedido' }).click();
     
     // Assert
-    await expect(page.getByTestId('order-result-VLO-U9BW56')).toMatchAriaSnapshot(`
+    await expect(page.getByTestId(`order-result-${testData.orderCode}`)).toMatchAriaSnapshot(`
       - img
       - paragraph: Pedido
-      - paragraph: VLO-U9BW56
+      - paragraph: ${testData.orderCode}
       - img
-      - text: APROVADO
-      `);
-    await expect(page.getByTestId('order-result-VLO-U9BW56')).toMatchAriaSnapshot(`
+      - text: ${testData.orderStatus}
       - img "Velô Sprint"
       - paragraph: Modelo
       - paragraph: Velô Sprint
