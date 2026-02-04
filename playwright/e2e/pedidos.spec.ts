@@ -59,4 +59,48 @@ test.describe('order lookup', () => {
       - paragraph: Verifique o número do pedido e tente novamente`);
   
   });
+
+  test('Should verify an approved with snapshot', async ({ page }) => {
+    // testData
+    const testData = {
+      orderCode: 'VLO-U9BW56',
+      orderStatus: 'APROVADO',
+    };
+  
+    // Act
+    await page.getByLabel('Número do Pedido').fill(testData.orderCode);
+    await page.getByRole('button', { name: 'Buscar Pedido' }).click();
+    
+    // Assert
+    await expect(page.getByTestId('order-result-VLO-U9BW56')).toMatchAriaSnapshot(`
+      - img
+      - paragraph: Pedido
+      - paragraph: VLO-U9BW56
+      - img
+      - text: APROVADO
+      `);
+    await expect(page.getByTestId('order-result-VLO-U9BW56')).toMatchAriaSnapshot(`
+      - img "Velô Sprint"
+      - paragraph: Modelo
+      - paragraph: Velô Sprint
+      - paragraph: Cor
+      - paragraph: Glacier Blue
+      - paragraph: Interior
+      - paragraph: cream
+      - paragraph: Rodas
+      - paragraph: aero Wheels
+      - heading "Dados do Cliente" [level=4]
+      - paragraph: Nome
+      - paragraph: Yarlei Cruz
+      - paragraph: Email
+      - paragraph: yarlei@cruz.com.br
+      - paragraph: Loja de Retirada
+      - paragraph
+      - paragraph: Data do Pedido
+      - paragraph: /\\d+\\/\\d+\\/\\d+/
+      - heading "Pagamento" [level=4]
+      - paragraph: À Vista
+      - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
+      `);
+  });
 })
