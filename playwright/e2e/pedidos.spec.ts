@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { generateOrderNumber } from '../support/helpers'
 // AAA Arrange Act Assert
 test.describe('order lookup', () => {
-  
+
   test.beforeEach(async ({ page }) => {
     // Arrange
     await page.goto('http://localhost:5173/');
@@ -40,6 +40,11 @@ test.describe('order lookup', () => {
     await expect(containerPedido).toContainText(testData.orderCode, { timeout: 10_000 });
 
     await expect(page.getByText(testData.orderStatus)).toBeVisible();
+
+    const statusBadge = page.getByRole('status').filter({ hasText: testData.orderStatus })
+    await expect(statusBadge).toHaveClass(/bg-green-100 text-green-700/);
+    const statusIcon = statusBadge.locator('svg');
+    await expect(statusIcon).toHaveClass(/lucide-circle-check-big/);
   });
 
   test('Should verify an non existing order', async ({ page }) => {
@@ -84,8 +89,9 @@ test.describe('order lookup', () => {
       - img
       - paragraph: Pedido
       - paragraph: ${testData.orderCode}
-      - img
-      - text: ${testData.orderStatus}
+      - status:
+        - img
+        - text: ${testData.orderStatus}
       - img "Velô Sprint"
       - paragraph: Modelo
       - paragraph: Velô Sprint
@@ -108,6 +114,12 @@ test.describe('order lookup', () => {
       - paragraph: ${testData.paymentMethod}
       - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
       `);
+
+    const statusBadge = page.getByRole('status').filter({ hasText: testData.orderStatus })
+    await expect(statusBadge).toHaveClass(/bg-green-100 text-green-700/);
+    const statusIcon = statusBadge.locator('svg');
+    await expect(statusIcon).toHaveClass(/lucide-circle-check-big/);
+
   });
 
   test('Should verify an reproved order with snapshot', async ({ page }) => {
@@ -132,8 +144,9 @@ test.describe('order lookup', () => {
       - img
       - paragraph: Pedido
       - paragraph: ${testData.orderCode}
-      - img
-      - text: ${testData.orderStatus}
+      - status:
+        - img
+        - text: ${testData.orderStatus}
       - img "Velô Sprint"
       - paragraph: Modelo
       - paragraph: Velô Sprint
@@ -156,6 +169,12 @@ test.describe('order lookup', () => {
       - paragraph: ${testData.paymentMethod}
       - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
       `);
+
+    const statusBadge = page.getByRole('status').filter({ hasText: testData.orderStatus })
+    await expect(statusBadge).toHaveClass(/bg-red-100 text-red-700/);
+    const statusIcon = statusBadge.locator('svg');
+    await expect(statusIcon).toHaveClass(/lucide-circle-x/);
+
   });
 
   test('Should verify an non existing order with snapshot', async ({ page }) => {
@@ -174,5 +193,60 @@ test.describe('order lookup', () => {
       - heading "Pedido não encontrado" [level=3]
       - paragraph: Verifique o número do pedido e tente novamente
       `);
+  });
+
+  test('Should verify an order in analysis', async ({ page }) => {
+    // testData
+    const testData = {
+      orderCode: 'VLO-FAFYGC',
+      orderStatus: 'EM_ANALISE',
+      carColor: 'Lunar White',
+      wheelType: 'sport Wheels',
+      customerName: 'Luiz Cruz',
+      customerEmail: 'Luiz@velo.com',
+      customerStore: 'Velô Paulista',
+      paymentMethod: 'À Vista',
+    };
+
+    // Act
+    await page.getByLabel('Número do Pedido').fill(testData.orderCode);
+    await page.getByRole('button', { name: 'Buscar Pedido' }).click();
+
+    // Assert
+    await expect(page.getByTestId(`order-result-${testData.orderCode}`)).toMatchAriaSnapshot(`
+      - img
+      - paragraph: Pedido
+      - paragraph: ${testData.orderCode}
+      - status:
+        - img
+        - text: ${testData.orderStatus}
+      - img "Velô Sprint"
+      - paragraph: Modelo
+      - paragraph: Velô Sprint
+      - paragraph: Cor
+      - paragraph: ${testData.carColor}
+      - paragraph: Interior
+      - paragraph: cream
+      - paragraph: Rodas
+      - paragraph: ${testData.wheelType}
+      - heading "Dados do Cliente" [level=4]
+      - paragraph: Nome
+      - paragraph: ${testData.customerName}
+      - paragraph: Email
+      - paragraph: ${testData.customerEmail}
+      - paragraph: Loja de Retirada
+      - paragraph
+      - paragraph: Data do Pedido
+      - paragraph: /\\d{2}\\/\\d{2}\\/\\d{4}/
+      - heading "Pagamento" [level=4]
+      - paragraph: ${testData.paymentMethod}
+      - paragraph: /R\\$ [\\d.,]+/
+      `);
+
+    const statusBadge = page.getByRole('status').filter({ hasText: testData.orderStatus })
+    await expect(statusBadge).toHaveClass(/bg-amber-100 text-amber-700/);
+    const statusIcon = statusBadge.locator('svg');
+    await expect(statusIcon).toHaveClass(/lucide-clock/);
+
   });
 })
