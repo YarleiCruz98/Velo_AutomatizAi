@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { generateOrderNumber } from '../support/helpers'
+import { ConsultaPedidoPage } from '../support/pages/ConsultaPedidoPage'
+import { generateOrderNumber} from '../support/helpers'
 // AAA Arrange Act Assert
 test.describe('order lookup', () => {
 
@@ -12,6 +13,7 @@ test.describe('order lookup', () => {
   })
 
   test('Should verify an approved order', async ({ page }) => {
+    const consultaPedidoPage = new ConsultaPedidoPage(page);
     // testData
     const testData = {
       orderCode: 'VLO-U9BW56',
@@ -19,8 +21,7 @@ test.describe('order lookup', () => {
     };
 
     // Act
-    await page.getByLabel('Número do Pedido').fill(testData.orderCode);
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click();
+    await consultaPedidoPage.searchOrder(testData.orderCode);
 
     // Assert
     // Locate the paragraph with the text "Pedido", go up to its parent element (the order block)
@@ -48,6 +49,7 @@ test.describe('order lookup', () => {
   });
 
   test('Should verify an non existing order', async ({ page }) => {
+    const consultaPedidoPage = new ConsultaPedidoPage(page);
     // testData
     const testData = {
       orderCode: generateOrderNumber(),
@@ -56,8 +58,7 @@ test.describe('order lookup', () => {
     };
 
     // Act
-    await page.getByLabel('Número do Pedido').fill(testData.orderCode);
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click();
+    await consultaPedidoPage.searchOrder(testData.orderCode);
 
     // Assert
     await expect(page.locator('#root')).toMatchAriaSnapshot(`
@@ -68,7 +69,7 @@ test.describe('order lookup', () => {
   });
 
   test('Should verify an approved order with snapshot', async ({ page }) => {
-    // testData
+    const consultaPedidoPage = new ConsultaPedidoPage(page);
     const testData = {
       orderCode: 'VLO-U9BW56',
       orderStatus: 'APROVADO',
@@ -80,9 +81,8 @@ test.describe('order lookup', () => {
       paymentMethod: 'À Vista',
     };
 
-    // Act
-    await page.getByLabel('Número do Pedido').fill(testData.orderCode);
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click();
+    // Act  
+    await consultaPedidoPage.searchOrder(testData.orderCode);
 
     // Assert
     await expect(page.getByTestId(`order-result-${testData.orderCode}`)).toMatchAriaSnapshot(`
@@ -123,6 +123,7 @@ test.describe('order lookup', () => {
   });
 
   test('Should verify an reproved order with snapshot', async ({ page }) => {
+    const consultaPedidoPage = new ConsultaPedidoPage(page);
     // testData
     const testData = {
       orderCode: 'VLO-DVVKQC',
@@ -136,8 +137,7 @@ test.describe('order lookup', () => {
     };
 
     // Act
-    await page.getByLabel('Número do Pedido').fill(testData.orderCode);
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click();
+    await consultaPedidoPage.searchOrder(testData.orderCode);
 
     // Assert
     await expect(page.getByTestId(`order-result-${testData.orderCode}`)).toMatchAriaSnapshot(`
@@ -178,14 +178,14 @@ test.describe('order lookup', () => {
   });
 
   test('Should verify an non existing order with snapshot', async ({ page }) => {
+    const consultaPedidoPage = new ConsultaPedidoPage(page);
     // testData
     const testData = {
-      orderCode: 'VLO-ABC123',
+      orderCode: generateOrderNumber(),
     };
 
     // Act
-    await page.getByLabel('Número do Pedido').fill(testData.orderCode);
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click();
+    await consultaPedidoPage.searchOrder(testData.orderCode);
 
     // Assert
     await expect(page.locator('#root')).toMatchAriaSnapshot(`
@@ -196,6 +196,7 @@ test.describe('order lookup', () => {
   });
 
   test('Should verify an order in analysis', async ({ page }) => {
+    const consultaPedidoPage = new ConsultaPedidoPage(page);
     // testData
     const testData = {
       orderCode: 'VLO-FAFYGC',
@@ -209,8 +210,7 @@ test.describe('order lookup', () => {
     };
 
     // Act
-    await page.getByLabel('Número do Pedido').fill(testData.orderCode);
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click();
+    await consultaPedidoPage.searchOrder(testData.orderCode);
 
     // Assert
     await expect(page.getByTestId(`order-result-${testData.orderCode}`)).toMatchAriaSnapshot(`
