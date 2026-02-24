@@ -13,32 +13,24 @@ const STATUS_STYLES: Record<OrderStatus, StatusStyle> = {
   EM_ANALISE: { cssClass: /bg-amber-100 text-amber-700/, iconClass: /lucide-clock/            },
 };
 
+export interface OrderResultExpectation {
+  orderCode: string;
+  orderStatus: OrderStatus;
+  carColor: string;
+  wheelType: string;
+  customerName: string;
+  customerEmail: string;
+  paymentMethod: string;
+}
+
 export class ConsultaPedidoPage {
   constructor(private page: Page) {}
-
-  // ---------------------------------------------------------------------------
-  // Actions
-  // ---------------------------------------------------------------------------
 
   async searchOrder(orderNumber: string) {
     await this.page.getByRole('textbox', { name: 'Número do Pedido' }).fill(orderNumber);
     await this.page.getByRole('button', { name: 'Buscar Pedido' }).click();
   }
 
-  // ---------------------------------------------------------------------------
-  // Assertions
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Asserts that the status badge:
-   *  - is visible
-   *  - contains the expected status text
-   *  - has the correct background/text CSS classes
-   *  - renders the correct SVG icon
-   *
-   * @example
-   *   await consultaPedidoPage.expectStatusBadge('APROVADO');
-   */
   async expectStatusBadge(status: OrderStatus) {
     const { cssClass, iconClass } = STATUS_STYLES[status];
 
@@ -48,5 +40,44 @@ export class ConsultaPedidoPage {
 
     const icon = badge.locator('svg');
     await expect(icon, `Ícone do badge deve ter a classe: ${iconClass}`).toHaveClass(iconClass);
+  }
+
+  async validateOrderResult(order: OrderResultExpectation) {
+    await expect(this.page.getByTestId(`order-result-${order.orderCode}`)).toMatchAriaSnapshot(`
+      - img
+      - paragraph: Pedido
+      - paragraph: ${order.orderCode}
+      - status:
+        - img
+        - text: ${order.orderStatus}
+      - img "Velô Sprint"
+      - paragraph: Modelo
+      - paragraph: Velô Sprint
+      - paragraph: Cor
+      - paragraph: ${order.carColor}
+      - paragraph: Interior
+      - paragraph: cream
+      - paragraph: Rodas
+      - paragraph: ${order.wheelType}
+      - heading "Dados do Cliente" [level=4]
+      - paragraph: Nome
+      - paragraph: ${order.customerName}
+      - paragraph: Email
+      - paragraph: ${order.customerEmail}
+      - paragraph: Loja de Retirada
+      - paragraph
+      - paragraph: Data do Pedido
+      - paragraph: /\\d+\\/\\d+\\/\\d+/
+      - heading "Pagamento" [level=4]
+      - paragraph: ${order.paymentMethod}
+      - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
+    `);
+  }
+  async validateNonExistingOrder(orderCode: any) {
+    await expect(this.page.locator('#root')).toMatchAriaSnapshot(`
+      - img
+      - heading "Pedido não encontrado" [level=3]
+      - paragraph: Verifique o número do pedido e tente novamente
+    `);
   }
 }

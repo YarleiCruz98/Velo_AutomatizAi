@@ -42,10 +42,11 @@ test.describe('order lookup', () => {
 
   test('Should verify an approved order with snapshot', async ({ page }) => {
     const consultaPedidoPage = new ConsultaPedidoPage(page);
-    const testData = {
+    const order = {
       orderCode:     'VLO-U9BW56',
       orderStatus:   'APROVADO' as const,
       carColor:      'Glacier Blue',
+      wheelType:     'aero Wheels',
       customerName:  'Yarlei Cruz',
       customerEmail: 'yarlei@cruz.com.br',
       customerStore: 'Velô Paulista',
@@ -53,41 +54,13 @@ test.describe('order lookup', () => {
     };
 
     // Act
-    await consultaPedidoPage.searchOrder(testData.orderCode);
+    await consultaPedidoPage.searchOrder(order.orderCode);
 
     // Assert — full aria snapshot
-    await expect(page.getByTestId(`order-result-${testData.orderCode}`)).toMatchAriaSnapshot(`
-      - img
-      - paragraph: Pedido
-      - paragraph: ${testData.orderCode}
-      - status:
-        - img
-        - text: ${testData.orderStatus}
-      - img "Velô Sprint"
-      - paragraph: Modelo
-      - paragraph: Velô Sprint
-      - paragraph: Cor
-      - paragraph: ${testData.carColor}
-      - paragraph: Interior
-      - paragraph: cream
-      - paragraph: Rodas
-      - paragraph: aero Wheels
-      - heading "Dados do Cliente" [level=4]
-      - paragraph: Nome
-      - paragraph: ${testData.customerName}
-      - paragraph: Email
-      - paragraph: ${testData.customerEmail}
-      - paragraph: Loja de Retirada
-      - paragraph
-      - paragraph: Data do Pedido
-      - paragraph: /\\d+\\/\\d+\\/\\d+/
-      - heading "Pagamento" [level=4]
-      - paragraph: ${testData.paymentMethod}
-      - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
-    `);
+    await consultaPedidoPage.validateOrderResult(order);
 
     // Badge style + icon delegated to the Page Object
-    await consultaPedidoPage.expectStatusBadge(testData.orderStatus);
+    await consultaPedidoPage.expectStatusBadge(order.orderStatus);
   });
 
   // ---------------------------------------------------------------------------
@@ -96,10 +69,11 @@ test.describe('order lookup', () => {
 
   test('Should verify a reproved order with snapshot', async ({ page }) => {
     const consultaPedidoPage = new ConsultaPedidoPage(page);
-    const testData = {
+    const order = {
       orderCode:     'VLO-DVVKQC',
       orderStatus:   'REPROVADO' as const,
       carColor:      'Midnight Black',
+      wheelType:     'sport Wheels',
       customerName:  'Jaci Teixeira',
       customerEmail: 'jaciteixera@velo.com',
       customerStore: 'Velô Paulista',
@@ -107,41 +81,13 @@ test.describe('order lookup', () => {
     };
 
     // Act
-    await consultaPedidoPage.searchOrder(testData.orderCode);
+    await consultaPedidoPage.searchOrder(order.orderCode);
 
     // Assert — full aria snapshot
-    await expect(page.getByTestId(`order-result-${testData.orderCode}`)).toMatchAriaSnapshot(`
-      - img
-      - paragraph: Pedido
-      - paragraph: ${testData.orderCode}
-      - status:
-        - img
-        - text: ${testData.orderStatus}
-      - img "Velô Sprint"
-      - paragraph: Modelo
-      - paragraph: Velô Sprint
-      - paragraph: Cor
-      - paragraph: ${testData.carColor}
-      - paragraph: Interior
-      - paragraph: cream
-      - paragraph: Rodas
-      - paragraph: sport Wheels
-      - heading "Dados do Cliente" [level=4]
-      - paragraph: Nome
-      - paragraph: ${testData.customerName}
-      - paragraph: Email
-      - paragraph: ${testData.customerEmail}
-      - paragraph: Loja de Retirada
-      - paragraph
-      - paragraph: Data do Pedido
-      - paragraph: /\\d+\\/\\d+\\/\\d+/
-      - heading "Pagamento" [level=4]
-      - paragraph: ${testData.paymentMethod}
-      - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
-    `);
+    await consultaPedidoPage.validateOrderResult(order);
 
     // Badge style + icon delegated to the Page Object
-    await consultaPedidoPage.expectStatusBadge(testData.orderStatus);
+    await consultaPedidoPage.expectStatusBadge(order.orderStatus);
   });
 
   // ---------------------------------------------------------------------------
@@ -150,7 +96,7 @@ test.describe('order lookup', () => {
 
   test('Should verify an order in analysis', async ({ page }) => {
     const consultaPedidoPage = new ConsultaPedidoPage(page);
-    const testData = {
+    const order = {
       orderCode:     'VLO-FAFYGC',
       orderStatus:   'EM_ANALISE' as const,
       carColor:      'Lunar White',
@@ -162,41 +108,13 @@ test.describe('order lookup', () => {
     };
 
     // Act
-    await consultaPedidoPage.searchOrder(testData.orderCode);
+    await consultaPedidoPage.searchOrder(order.orderCode);
 
     // Assert — full aria snapshot
-    await expect(page.getByTestId(`order-result-${testData.orderCode}`)).toMatchAriaSnapshot(`
-      - img
-      - paragraph: Pedido
-      - paragraph: ${testData.orderCode}
-      - status:
-        - img
-        - text: ${testData.orderStatus}
-      - img "Velô Sprint"
-      - paragraph: Modelo
-      - paragraph: Velô Sprint
-      - paragraph: Cor
-      - paragraph: ${testData.carColor}
-      - paragraph: Interior
-      - paragraph: cream
-      - paragraph: Rodas
-      - paragraph: ${testData.wheelType}
-      - heading "Dados do Cliente" [level=4]
-      - paragraph: Nome
-      - paragraph: ${testData.customerName}
-      - paragraph: Email
-      - paragraph: ${testData.customerEmail}
-      - paragraph: Loja de Retirada
-      - paragraph
-      - paragraph: Data do Pedido
-      - paragraph: /\\d{2}\\/\\d{2}\\/\\d{4}/
-      - heading "Pagamento" [level=4]
-      - paragraph: ${testData.paymentMethod}
-      - paragraph: /R\\$ [\\d.,]+/
-    `);
+    await consultaPedidoPage.validateOrderResult(order);
 
     // Badge style + icon delegated to the Page Object
-    await consultaPedidoPage.expectStatusBadge(testData.orderStatus);
+    await consultaPedidoPage.expectStatusBadge(order.orderStatus);
   });
 
   // ---------------------------------------------------------------------------
@@ -205,30 +123,22 @@ test.describe('order lookup', () => {
 
   test('Should verify a non existing order', async ({ page }) => {
     const consultaPedidoPage = new ConsultaPedidoPage(page);
-    const testData = { orderCode: generateOrderNumber() };
+    const orderCode = generateOrderNumber();
 
     // Act
-    await consultaPedidoPage.searchOrder(testData.orderCode);
+    await consultaPedidoPage.searchOrder(orderCode);
 
     // Assert
-    await expect(page.locator('#root')).toMatchAriaSnapshot(`
-      - img
-      - heading "Pedido não encontrado" [level=3]
-      - paragraph: Verifique o número do pedido e tente novamente`);
+    await consultaPedidoPage.validateNonExistingOrder(orderCode);
   });
 
-  test('Should verify a non existing order with snapshot', async ({ page }) => {
+  test('Should verify an order winth number format different from the expected', async ({ page }) => {
     const consultaPedidoPage = new ConsultaPedidoPage(page);
-    const testData = { orderCode: generateOrderNumber() };
 
     // Act
-    await consultaPedidoPage.searchOrder(testData.orderCode);
+    await consultaPedidoPage.searchOrder("ABC123");
 
     // Assert
-    await expect(page.locator('#root')).toMatchAriaSnapshot(`
-      - img
-      - heading "Pedido não encontrado" [level=3]
-      - paragraph: Verifique o número do pedido e tente novamente
-    `);
+    await consultaPedidoPage.validateNonExistingOrder("ABC123");
   });
 });
