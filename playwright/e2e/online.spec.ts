@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../support/fixtures';
 
 test('The Velô web app should be online', async ({ page }) => {
   await page.goto('http://localhost:5173');
