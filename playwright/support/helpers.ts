@@ -1,5 +1,3 @@
-import { Page } from '@playwright/test'
-
 export function generateOrderNumber(prefixo = "VLO", tamanho = 6) {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let sufixo = "";
