@@ -22,7 +22,6 @@ export interface OrderResultExpectation {
   customerEmail: string;
   paymentMethod: string;
 }
-
 export class ConsultaPedidoPage {
   constructor(private page: Page) {}
 
@@ -73,7 +72,7 @@ export class ConsultaPedidoPage {
       - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
     `);
   }
-  async validateNonExistingOrder(orderCode: any) {
+  async validateNonExistingOrder() {
     await expect(this.page.locator('#root')).toMatchAriaSnapshot(`
       - img
       - heading "Pedido não encontrado" [level=3]
