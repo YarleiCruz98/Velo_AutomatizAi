@@ -69,10 +69,16 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Apply preview migrations
+      - name: Configure Preview database endpoint
         env:
           PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
-        run: yarn supabase db push --db-url "$PREVIEW_DATABASE_URL" --yes
+        run: |
+          DATABASE_URL="${PREVIEW_DATABASE_URL/aws-0-sa-east-1.pooler.supabase.com/aws-1-sa-east-1.pooler.supabase.com}"
+          echo "::add-mask::$DATABASE_URL"
+          echo "DATABASE_URL=$DATABASE_URL" >> "$GITHUB_ENV"
+
+      - name: Apply preview migrations
+        run: yarn supabase db push --db-url "$DATABASE_URL" --yes
 
       - name: Deploy preview Edge Functions
         env:
@@ -157,11 +163,18 @@ jobs:
       - name: Install Chromium
         run: yarn playwright install --with-deps chromium
 
+      - name: Configure Preview database endpoint
+        env:
+          PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+        run: |
+          DATABASE_URL="${PREVIEW_DATABASE_URL/aws-0-sa-east-1.pooler.supabase.com/aws-1-sa-east-1.pooler.supabase.com}"
+          echo "::add-mask::$DATABASE_URL"
+          echo "DATABASE_URL=$DATABASE_URL" >> "$GITHUB_ENV"
+
       - name: Run Playwright regression tests
         run: yarn playwright test --project=chromium
         env:
           BASE_URL: ${{ needs.build-preview.outputs.deployment-url }}
-          DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
           SUPABASE_PROJECT_REF_PREVIEW: ${{ vars.SUPABASE_PROJECT_REF_PREVIEW }}
           SUPABASE_PROJECT_REF_PRODUCTION: ${{ vars.SUPABASE_PROJECT_REF_PRODUCTION }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
