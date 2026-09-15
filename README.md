@@ -154,7 +154,25 @@ Landing → Configurador → Checkout → Análise de Crédito → Confirmação
 ## Scripts
 
 ```bash
-npm run dev      # Desenvolvimento
-npm run build    # Build de produção
-npm run lint     # Verificar código
+yarn dev         # Desenvolvimento
+yarn build       # Build de produção
+yarn lint        # Verificar código
+yarn typecheck   # Verificar tipos TypeScript
+yarn test:unit   # Executar testes unitários uma vez
 ```
+
+---
+
+## CI/CD com ambientes isolados
+
+O workflow `.github/workflows/cd.yml` mantém Preview e Production separados:
+
+1. executa os testes unitários;
+2. sincroniza migrações e Edge Functions no Supabase de preview;
+3. compila e publica o deploy de preview;
+4. executa os testes Playwright somente no ambiente de preview;
+5. compila novamente com as variáveis de Production;
+6. publica o build de produção.
+
+As instruções completas de configuração, variáveis e validação estão em
+[`docs/preview-environment.md`](docs/preview-environment.md).
