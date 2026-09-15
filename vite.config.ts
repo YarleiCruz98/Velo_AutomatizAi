@@ -12,7 +12,10 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-    exclude: ['playwright/**', 'node_modules/**'],
+    include: [
+      'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+      'playwright/support/**/*.{test,spec}.{ts,tsx}',
+    ],
+    exclude: ['playwright/e2e/**', 'playwright/backup/**', 'node_modules/**'],
   },
 });

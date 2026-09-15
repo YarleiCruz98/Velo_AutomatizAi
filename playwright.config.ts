@@ -47,6 +47,14 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env.BASE_URL || 'http://localhost:5173',
 
+    // Allows CI to access a protected Vercel Preview without exposing the URL.
+    extraHTTPHeaders: process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+      ? {
+          'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
+          'x-vercel-set-bypass-cookie': 'true',
+        }
+      : undefined,
+
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on',
 
@@ -98,9 +106,11 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: 'yarn dev',
-    url: 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: process.env.CI
+    ? undefined
+    : {
+        command: 'yarn dev',
+        url: 'http://localhost:5173',
+        reuseExistingServer: true,
+      },
 });
