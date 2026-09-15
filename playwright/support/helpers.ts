@@ -1,11 +1,13 @@
-export function generateOrderNumber(prefixo = "VLO", tamanho = 6) {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let sufixo = "";
+export function generateOrderCode() {
+    const prefix = 'VLO'
 
-  for (let i = 0; i < tamanho; i++) {
-    const idx = Math.floor(Math.random() * chars.length);
-    sufixo += chars[idx];
-  }
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    let randomPart = ''
 
-  return `${prefixo}-${sufixo}`;
+    for (let i = 0; i < 6; i++) {
+        const randomIndex = Math.floor(Math.random() * chars.length)
+        randomPart += chars[randomIndex]
+    }
+
+    return `${prefix}-${randomPart}`
 }

@@ -1,25 +1,35 @@
-import { test as base } from '@playwright/test';
-import { createHomeActions } from './actions/homeActions';
-import { createNavbarActions } from './actions/navbarActions';
-import { createOrderLookupActions } from './actions/orderLookupActions';
+import { test as base } from '@playwright/test'
 
-export type App = {
-  home: ReturnType<typeof createHomeActions>;
-  navbar: ReturnType<typeof createNavbarActions>;
-  orderLookup: ReturnType<typeof createOrderLookupActions>;
-};
+import { createCheckoutActions } from './actions/checkoutActions'
+import { createConfiguratorActions } from './actions/configuratorActions'
+import { createOrderLookupActions } from './actions/orderLookupActions'
+import { createHeroActions } from './actions/heroActions'
+
+import { mockCreditAnalysis } from './mock.api'
+
+type App = {
+  checkout: ReturnType<typeof createCheckoutActions>
+  configurator: ReturnType<typeof createConfiguratorActions>
+  orderLookup: ReturnType<typeof createOrderLookupActions>
+  hero: ReturnType<typeof createHeroActions>
+  mock: {
+    creditAnalysis: (score: number) => Promise<void>
+  }
+}
 
 export const test = base.extend<{ app: App }>({
   app: async ({ page }, use) => {
     const app: App = {
-      home: createHomeActions(page),
-      navbar: createNavbarActions(page),
+      checkout: createCheckoutActions(page),
+      configurator: createConfiguratorActions(page),
       orderLookup: createOrderLookupActions(page),
-    };
-
-    await use(app);
+      hero: createHeroActions(page),
+      mock: {
+        creditAnalysis: async (score: number) => await mockCreditAnalysis(page, score),
+      }
+    }
+    await use(app)
   },
-});
+})
 
-export { expect } from '@playwright/test';
-
+export { expect } from '@playwright/test'
