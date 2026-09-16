@@ -136,7 +136,9 @@ jobs:
       - name: Deploy Preview
         id: deploy
         run: |
-          URL=$(yarn --silent vercel deploy --prebuilt --target=preview --token="$VERCEL_TOKEN")
+          set -euo pipefail
+          URL=$(yarn --silent vercel deploy --prebuilt --target=preview --token="$VERCEL_TOKEN" | grep -Eo 'https://[[:alnum:].-]+\.vercel\.app' | tail -n 1)
+          test -n "$URL"
           echo "deployment-url=$URL" >> "$GITHUB_OUTPUT"
 
   e2e-tests:
