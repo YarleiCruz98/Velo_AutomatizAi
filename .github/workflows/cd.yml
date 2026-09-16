@@ -78,7 +78,14 @@ jobs:
           echo "DATABASE_URL=$DATABASE_URL" >> "$GITHUB_ENV"
 
       - name: Apply preview migrations
-        run: yarn supabase db push --db-url "$DATABASE_URL" --yes
+        run: |
+          DB_PUSH_URL="$DATABASE_URL"
+          if [[ "$DB_PUSH_URL" == *\?* ]]; then
+            DB_PUSH_URL="${DB_PUSH_URL}&default_query_exec_mode=simple_protocol"
+          else
+            DB_PUSH_URL="${DB_PUSH_URL}?default_query_exec_mode=simple_protocol"
+          fi
+          yarn supabase db push --db-url "$DB_PUSH_URL" --yes
 
       - name: Deploy preview Edge Functions
         env:
@@ -222,7 +229,14 @@ jobs:
       - name: Apply production migrations
         env:
           PRODUCTION_DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
-        run: yarn supabase db push --db-url "$PRODUCTION_DATABASE_URL" --yes
+        run: |
+          DB_PUSH_URL="$PRODUCTION_DATABASE_URL"
+          if [[ "$DB_PUSH_URL" == *\?* ]]; then
+            DB_PUSH_URL="${DB_PUSH_URL}&default_query_exec_mode=simple_protocol"
+          else
+            DB_PUSH_URL="${DB_PUSH_URL}?default_query_exec_mode=simple_protocol"
+          fi
+          yarn supabase db push --db-url "$DB_PUSH_URL" --yes
 
       - name: Deploy production Edge Functions
         env:
