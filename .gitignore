@@ -29,3 +29,12 @@ dist-ssr
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Cloud CLI local state
+.vercel/
+supabase/.temp/
